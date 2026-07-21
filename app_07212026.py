@@ -2,15 +2,15 @@
 import json
 import os
 import streamlit as st
-from kubernetes import client, config
-
 PROGRESS_FILE = "progress.json"
+progress = load_progress()
 
 def load_progress():
 
     if os.path.exists(PROGRESS_FILE):
 
         with open(PROGRESS_FILE, "r") as f:
+
             return json.load(f)
 
     return {
@@ -22,6 +22,7 @@ def load_progress():
 def save_progress(data):
 
     with open(PROGRESS_FILE, "w") as f:
+
         json.dump(data, f, indent=4)
 
 from kubernetes import client, config
@@ -32,13 +33,35 @@ st.set_page_config(
     layout="wide"
 )
 
+# # Kubernetes Connection
+
+# try:
+#     config.load_kube_config()
+
+#     v1 = client.CoreV1Api()
+#     apps_v1 = client.AppsV1Api()
+
+#     nodes = len(v1.list_node().items)
+#     pods = len(v1.list_pod_for_all_namespaces().items)
+
+# except Exception as e:
+#     nodes = 0
+#     pods = 0
+
+# st.success(f"☸️ Kubernetes Connected")
+
+# st.write(f"Nodes Found: {nodes}")
+# st.write(f"Pods Found: {pods}")
+
+# =====================================
+# KUBERNETES CONNECTION
+# =====================================
+
 try:
     config.load_kube_config()
 
     v1 = client.CoreV1Api()
     apps_v1 = client.AppsV1Api()
-
-    progress = load_progress()
 
     nodes = len(v1.list_node().items)
     pods = len(v1.list_pod_for_all_namespaces().items)
@@ -143,19 +166,36 @@ st.subheader("🏆 Kubernetes Journey")
 col1, col2 = st.columns(2)
 
 with col1:
+    st.progress(10)
 
-    st.progress(min(progress["xp"] / 500, 1.0))
+    st.info("""
+Current Rank: 🌱 Kubernetes Beginner
 
-    st.info(
-        f"""
-Current Rank: {progress['badge']}
+# XP Earned: 10
 
-XP Earned: {progress['xp']}
+st.metric(
+    "XP Earned",
+    progress["xp"]
+)            
 
 Next Badge:
 ☸️ Pod Explorer
-"""
-    )
+""")
+
+# with col2:
+#     st.success("""
+# 🎯 Current Mission
+
+# Complete Pod Fundamentals Lab
+
+# Reward:
+# +50 XP
+# +1 Badge
+# """)
+
+# st.divider()
+
+# # POD LAB CARD
 
 with col2:
     st.success("""
